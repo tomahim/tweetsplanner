@@ -22,6 +22,6 @@ docker-compose up --build
 ### Features roadmap
 
 - [x] Being able to launch ReactJS, Flask and PostgreSQL using Docker
-- [ ] Basic Login / registration feature
+- [ ] Basic Login / registration feature --> IN PROGRESS
 - [ ] Create a CRUD dashboard to plan tweets
 - [ ] Use Twitter API
