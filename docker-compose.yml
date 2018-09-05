@@ -1,0 +1,64 @@
+version: '3.5'
+
+services:
+
+  db:
+    image: postgres:10.5
+    container_name: tp-postgres
+    ports:
+      - '5432:5432'
+    networks:
+      vpcbr:
+        ipv4_address: 172.19.0.4
+    environment:
+      - POSTGRES_DB=tweetsplanner
+      - POSTGRES_USER=tpuser
+      - POSTGRES_PASSWORD=tppassword
+    volumes:
+      - './db/init:/docker-entrypoint-initdb.d/'
+
+  flask-api:
+    container_name: tp-api
+    restart: always
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    networks:
+      vpcbr:
+        # TODO: see why the following error doesn't occur with the following IP
+        # FATAL: no pg_hba.conf entry for host "172.20.0.1", user "tpuser", database "tweetsplanner", SSL off
+        ipv4_address: 172.19.0.3
+    volumes:
+      - ./backend:/usr/src/app
+    depends_on:
+      - "db"
+
+  client:
+    container_name: tp-front
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - './client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '3000:3000'
+    networks:
+      vpcbr:
+        ipv4_address: 172.19.0.2
+    depends_on:
+      - "flask-api"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - HOST_URL=http://192.168.99.100:5000
+
+# FIXME: Following section should not be used (except for dev environment)
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 172.19.0.0/16
