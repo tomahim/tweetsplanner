@@ -1,31 +1,41 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
-import { CONFIG } from './config.js';
+import { Login } from './Login.js';
+import { Dashboard } from './Dashboard.js';
+import { PrivateRoute } from './PrivateRoute.js';
+
+const Welcome = () => (
+    <h1>Welcome to the Tweet Planner App !</h1>
+)
+
+// The Header creates links that can be used to navigate
+// between routes.
+const Header = () => (
+  <Router>
+    <header>
+      <ul>
+        <li>
+          <Link to="/login">Login</Link>
+          <Link to="/dashboard">Dashboard</Link>
+        </li>
+      </ul>
+
+      <hr />
+
+      <Route exact path="/" component={Welcome} />
+      <Route exact path="/login" component={Login} />
+      <PrivateRoute exact path="/dashboard" component={Dashboard} />
+    </header>
+  </Router>
+)
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-        players: []
-    };
-  }
-
-  componentDidMount() {
-    fetch(CONFIG.API_BASE_URL + CONFIG.API_PLAYER_BASE_URL)
-        .then(results => results.json())
-        .then(players => this.setState({players: players}));
-  }
-
   render() {
-    const players = this.state.players.map((player, index) => <li key={index}>{player.lastname} {player.firstname}</li>);
-
     return (
       <div>
-          <h1>Players list</h1>
-          <ul>
-            {players}
-          </ul>
+          <Header />
       </div>
     );
   }
