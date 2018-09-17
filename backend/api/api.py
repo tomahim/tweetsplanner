@@ -62,12 +62,15 @@ def login():
     if user is None or not user.check_password(request.json['password']):
         return 'Invalid username or password'
 
+    expire_date = datetime.utcnow() + timedelta(minutes=300)
+
     token = jwt.encode({
         'sub': user.username,
         'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=30)},
+        'exp': expire_date},
         current_app.config['SECRET_KEY'])
-    return jsonify({ 'token': token.decode('UTF-8') })
+
+    return jsonify({'cookie': 'Authorization={}; expires={}'.format(token.decode('UTF-8'), expire_date)})
 
 @users_blueprint.route('/logout', methods=['POST'])
 @token_required

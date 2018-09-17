@@ -16,7 +16,7 @@ def create_app(config):
 def register_api(app):
     # http://flask.pocoo.org/docs/1.0/views/#method-views-for-apis
     player_view = PlayerAPI.as_view('player_api')
-    app.add_url_rule('/players/', view_func=player_view, methods=['GET',])
+    app.add_url_rule('/players', view_func=player_view, methods=['GET',])
 
     app.register_blueprint(users_blueprint)
 
