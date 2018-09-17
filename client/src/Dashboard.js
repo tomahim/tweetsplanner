@@ -10,9 +10,17 @@ export class Dashboard extends Component {
   }
 
   componentDidMount() {
-    /*fetch(CONFIG.API_BASE_URL + CONFIG.API_PLAYER_BASE_URL)
-        .then(results => results.json())
-        .then(players => this.setState({players: players}));*/
+    const authCookies = document.cookie.split('Authorization=');
+    const headers = {
+        'Authorization': authCookies && authCookies.length === 2 ? authCookies[1] : '',
+        'Content-Type': 'application/json'
+    };
+    fetch(CONFIG.API_BASE_URL + CONFIG.API_PLAYER_URL, {
+        method: 'GET',
+        headers: headers
+    })
+    .then(results => results.json())
+    .then(players => this.setState({players: players}));
   }
 
   render() {

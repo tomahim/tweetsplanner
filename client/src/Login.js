@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 
-import { fakeAuth } from './utils/auth.js';
+import { authService } from './utils/auth.js';
 
 
 export class Login extends Component {
@@ -13,15 +13,21 @@ export class Login extends Component {
   }
 
   login = () => {
-    fakeAuth.authenticate(() => {
-      this.setState({ redirectToReferrer: true });
-    });
+    authService.authenticate('tom', 'toto')
+     .then(() => {
+        this.setState({ redirectToReferrer: true });
+     });
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
 
   render() {
     const { from } = this.props.location.state || { from: { pathname: "/" } };
     const { redirectToReferrer } = this.state;
 
+    console.log('qdkjfskdfjlsdkjf')
     if (redirectToReferrer) {
       return <Redirect to={from} />;
     }
