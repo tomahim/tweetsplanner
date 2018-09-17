@@ -55,12 +55,17 @@ users_blueprint = Blueprint('users', __name__, url_prefix='/users')
 
 @users_blueprint.route('/login', methods=['POST'])
 def login():
+    invalid_msg = {
+        'message': 'Username / password is invalid',
+        'authenticated': False
+    }
+
     if request.json is None:
-        return 'WRONG PARAMS'
+        return jsonify(invalid_msg), 401
 
     user = User.query.filter_by(username=request.json['username']).first()
     if user is None or not user.check_password(request.json['password']):
-        return 'Invalid username or password'
+        return jsonify(invalid_msg), 401
 
     expire_date = datetime.utcnow() + timedelta(minutes=300)
 

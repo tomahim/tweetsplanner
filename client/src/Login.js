@@ -6,38 +6,71 @@ import { authService } from './utils/auth.js';
 
 export class Login extends Component {
   constructor() {
-      super();
-      this.state = {
+    super();
+    this.state = {
+        username: '',
+        password: '',
+        error: false,
         redirectToReferrer: false
-      };
+    };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  login = () => {
-    authService.authenticate('tom', 'toto')
-     .then(() => {
-        this.setState({ redirectToReferrer: true });
+  handleSubmit(event) {
+    authService.authenticate(
+        this.state.username,
+        this.state.password
+    )
+    .then(response => {
+        this.setState({redirectToReferrer: true});
+     })
+     .catch(() => {
+        this.setState({error: true});
      });
-  };
+     event.preventDefault();
+  }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
+  handleChange(e) {
+    const {name, value} = e.target;
+    this.setState({
+      [name]: value
+    });
   }
 
   render() {
     const { from } = this.props.location.state || { from: { pathname: "/" } };
     const { redirectToReferrer } = this.state;
 
-    console.log('qdkjfskdfjlsdkjf')
     if (redirectToReferrer) {
       return <Redirect to={from} />;
     }
 
     return (
       <div>
+          {authService.isAuthenticated() &&
+            <Redirect
+              to={{
+                pathname: "/"
+              }}
+            />
+          }
           <h1>Login</h1>
+          {this.state.error && (<div>Error</div>)}
           <div>
             <p>You must log in to view the page at {from.pathname}</p>
-            <button onClick={this.login}>Log in</button>
+            <form onSubmit={this.handleSubmit}>
+              <label>
+                Username:
+                <input value={this.state.username} type="text" name="username" onChange={this.handleChange} />
+              </label>
+              <label>
+                Password:
+                <input value={this.state.password} type="password" name="password" onChange={this.handleChange}  />
+              </label>
+              <input type="submit" value="Submit"/>
+            </form>
           </div>
        </div>
     );
