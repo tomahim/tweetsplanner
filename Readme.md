@@ -25,3 +25,4 @@ docker-compose up --build
 - [ ] Basic Login / registration feature (with JWT support) --> IN PROGRESS
 - [ ] Create a CRUD dashboard to plan tweets
 - [ ] Use Twitter API
+- [ ] Add unit tests
