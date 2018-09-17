@@ -1,10 +1,8 @@
 import json
 
-from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from werkzeug.security import generate_password_hash, check_password_hash
-from .auth import login_manager
 
 db = SQLAlchemy()
 
@@ -16,7 +14,7 @@ class Player(db.Model):
     def __repr__(self):
         return '<Player %r>' % self.firstname + ' ' + self.lastname
 
-class User(db.Model,  UserMixin):
+class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), nullable=False)
@@ -28,9 +26,10 @@ class User(db.Model,  UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+class JwtBlacklist(db.Model):
+    __tablename__ = 'jwt_blacklist'
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String, nullable=False)
 
 def to_dict(obj):
     if isinstance(obj.__class__, DeclarativeMeta):

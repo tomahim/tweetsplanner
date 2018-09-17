@@ -3,9 +3,6 @@ from flask_cors import CORS
 from api.config import Config
 from api.api import PlayerAPI, users_blueprint
 from api.models import db
-from api.auth import login_manager
-
-
 
 def create_app(config):
     app = Flask(__name__)
@@ -25,7 +22,6 @@ def register_api(app):
 
 def register_extensions(app):
     db.init_app(app)
-    login_manager.init_app(app)
     register_api(app)
 
 app = create_app(Config)

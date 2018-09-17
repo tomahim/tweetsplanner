@@ -1,6 +1,6 @@
 Flask==0.12
+PyJWT==1.6.4
 flask-cors==3.0.6
 flask_sqlalchemy==2.3
 psycopg2
-flask-login==0.4.1
 werkzeug==0.13
