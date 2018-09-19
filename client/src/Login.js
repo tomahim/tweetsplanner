@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom';
 
 import { authService } from './utils/auth.js';
 
-
 export class Login extends Component {
   constructor() {
     super();
@@ -49,13 +48,6 @@ export class Login extends Component {
 
     return (
       <div>
-          {authService.isAuthenticated() &&
-            <Redirect
-              to={{
-                pathname: "/"
-              }}
-            />
-          }
           <h1>Login</h1>
           {this.state.error && (<div>Error</div>)}
           <div>

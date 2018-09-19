@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom
 import logo from './logo.svg';
 import './App.css';
 import { Login } from './Login.js';
+import { LoggedIn } from './LoggedIn.js';
 import { Dashboard } from './Dashboard.js';
 import { PrivateRoute } from './PrivateRoute.js';
 import { authService } from './utils/auth.js';
@@ -51,6 +52,7 @@ class Header extends React.Component {
 
           <Route exact path="/" component={Welcome} />
           <Route exact path="/login" component={Login} />
+          <Route exact path="/loggedin" component={LoggedIn} />
           <PrivateRoute exact path="/dashboard" component={Dashboard} />
         </header>
       </Router>

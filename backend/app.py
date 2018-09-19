@@ -4,10 +4,11 @@ from api.config import Config
 from api.api import PlayerAPI, users_blueprint
 from api.models import db
 
+
 def create_app(config):
     app = Flask(__name__)
     app.secret_key = Config.SECRET_KEY
-    CORS(app)
+    CORS(app, expose_headers=['Authorization'], supports_credentials=True)
     app.config.from_object(config)
     register_extensions(app)
     return app

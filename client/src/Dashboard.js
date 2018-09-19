@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { CONFIG } from './config.js';
 
+
+import { twitterService } from './utils/twitter.service.js';
 export class Dashboard extends Component {
   constructor() {
     super();
@@ -10,17 +12,8 @@ export class Dashboard extends Component {
   }
 
   componentDidMount() {
-    const authCookies = document.cookie.split('Authorization=');
-    const headers = {
-        'Authorization': authCookies && authCookies.length === 2 ? authCookies[1] : '',
-        'Content-Type': 'application/json'
-    };
-    fetch(CONFIG.API_BASE_URL + CONFIG.API_PLAYER_URL, {
-        method: 'GET',
-        headers: headers
-    })
-    .then(results => results.json())
-    .then(players => this.setState({players: players}));
+    twitterService.getData()
+    .then(result => this.setState({players: result.data}));
   }
 
   render() {
