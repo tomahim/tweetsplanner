@@ -1,15 +1,16 @@
-import cgi
 from datetime import datetime, timedelta
 from functools import wraps
 from urllib import parse as urlparser
 
 import jwt
 import oauth2
-from flask import current_app, jsonify, request, redirect, Blueprint, session
+import tweepy
+from flask import current_app, jsonify, request, Blueprint, session
 from flask.views import MethodView
 
 from .models import Player as PlayerModel, to_dict, JwtBlacklist, db
 from .models import User
+from .twitter_credentials import app_access_token
 
 
 def token_required(f):
@@ -48,9 +49,7 @@ def token_required(f):
 
     return _verify
 
-# It's probably a good idea to put your consumer's OAuth token and
-# OAuth secret into your project's settings.
-consumer = oauth2.Consumer('cTRantOxOurOTbS7LvJhnKDc7', 'biw4IBJGogdUShAaDLTGeRD61138L7miIZcsw3MCflP90I6BQT')
+consumer = oauth2.Consumer(app_access_token['key'], app_access_token['secret'])
 client = oauth2.Client(consumer)
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
@@ -88,57 +87,49 @@ def login():
 @users_blueprint.route('/confirm_authenticate', methods=['POST'])
 def confirm_authenticate():
     # Step 1. Use the request token in the session to build a new client.
-
     token = oauth2.Token(session['request_token']['oauth_token'][0],
                         session['request_token']['oauth_token_secret'][0])
     token.set_verifier(request.json['oauth_verifier'])
     client = oauth2.Client(consumer, token)
-
-
 
     # Step 2. Request the authorized access token from Twitter.
     resp, content = client.request(access_token_url, "GET")
     if resp['status'] != '200':
         raise Exception("Invalid response from Twitter.")
 
-    """
-    This is what you'll get back from Twitter. Note that it includes the
-    user's user_id and screen_name.
-    {
-        'oauth_token_secret': 'IcJXPiJh8be3BjDWW50uCY31chyhsMHEhqJVsphC3M',
-        'user_id': '120889797', 
-        'oauth_token': '120889797-H5zNnM3qE0iFoTTpNEHIz3noL9FKzXiOxwtnyVOD',
-        'screen_name': 'heyismysiteup'
-    }
-    """
     access_token = dict(urlparser.parse_qs(content.decode('utf-8')))
-
-    # invalid_msg = {
-    #     'message': 'Username / password is invalid',
-    #     'authenticated': False
-    # }
-    #
-    # if request.json is None:
-    #     return jsonify(invalid_msg), 401
-    #
-    # user = User.query.filter_by(username=request.json['username']).first()
-    # if user is None or not user.check_password(request.json['password']):
-    #     return jsonify(invalid_msg), 401
 
     expire_date = datetime.utcnow() + timedelta(days=4000)
 
+    username = access_token['screen_name'][0]
+
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        new_user = User(username=username, twitter_id=access_token['user_id'][0], oauth_token=access_token['oauth_token'][0], oauth_secret=access_token['oauth_token_secret'][0])
+        db.session.add(new_user)
+        db.session.commit()
+
     token = jwt.encode({
-        'sub': 'tom',
+        'sub': username,
         'iat': datetime.utcnow(),
         'exp': expire_date},
         current_app.config['SECRET_KEY'])
 
     response = jsonify()
     response.set_cookie('Authorization', token.decode('UTF-8'))
-    response.set_cookie('oauth_token', access_token['oauth_token'][0])
-    response.set_cookie('oauth_secret', access_token['oauth_token_secret'][0])
     session.pop('request_token')
     return response
+
+@users_blueprint.route('/tweet', methods=['POST'])
+@token_required
+def tweet(**kwargs):
+    current_user = kwargs.get('current_user')
+    auth = tweepy.OAuthHandler(app_access_token['key'], app_access_token['secret'])
+    auth.set_access_token(current_user.oauth_token, current_user.oauth_secret)
+
+    api = tweepy.API(auth)
+    api.update_status(status='Updating using OAuth authentication via Tweepy!')
+    return jsonify({'status': 'ok'})
 
 
 
@@ -153,4 +144,4 @@ def logout(**kwargs):
 @users_blueprint.route('/me', methods=['GET'])
 @token_required
 def me(**kwargs):
-    return jsonify({'username': kwargs.get('username')})
+    return jsonify({'username': kwargs.get('current_user').username})
