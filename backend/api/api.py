@@ -6,9 +6,8 @@ import jwt
 import oauth2
 import tweepy
 from flask import current_app, jsonify, request, Blueprint, session
-from flask.views import MethodView
 
-from .models import Player as PlayerModel, to_dict, JwtBlacklist, db
+from .models import JwtBlacklist, db, Tweet, to_dict
 from .models import User
 from .twitter_credentials import app_access_token
 
@@ -43,9 +42,15 @@ def token_required(f):
             return f(current_user=user, token=token, *args, **kwargs)
         except jwt.ExpiredSignatureError:
             return jsonify(expired_msg), 401 # 401 is Unauthorized HTTP status code
-        except (jwt.InvalidTokenError, Exception) as e:
+        except jwt.InvalidTokenError as e:
             print(e)
             return jsonify(invalid_msg), 401
+        except Exception as e:
+            print(e)
+            return jsonify({
+                'message': 'An error occured',
+                'authenticated': True
+            }), 500
 
     return _verify
 
@@ -72,11 +77,39 @@ def get_twitter_auth_url():
 
     return url
 
+tweets_blueprint = Blueprint('tweets', __name__, url_prefix='/tweets')
 
-class PlayerAPI(MethodView):
-    @token_required
-    def get(self, **kwargs):
-        return jsonify([to_dict(player) for player in PlayerModel.query.all()])
+@tweets_blueprint.route('', methods=['POST'])
+@token_required
+def create_tweet(**kwargs):
+    current_user = kwargs.get('current_user')
+    tweet = Tweet(text=request.json['text'], status='DRAFT')
+    current_user.tweets.append(tweet)
+    db.session.flush()
+    db.session.commit()
+    return jsonify({'id': tweet.id})
+
+@tweets_blueprint.route('/<int:id>', methods=['PUT'])
+@token_required
+def update_tweet(**kwargs):
+    tweet = Tweet.query.filter(Tweet.id == request.view_args['id']).first()
+    tweet.text = request.json['text']
+    db.session.commit()
+    return jsonify({'id': tweet.id})
+
+@tweets_blueprint.route('/<int:id>', methods=['DELETE'])
+@token_required
+def delete_tweet(**kwargs):
+    Tweet.query.filter(Tweet.id == request.view_args['id']).delete()
+    db.session.commit()
+    return jsonify({'status': 'ok'})
+
+@tweets_blueprint.route('', methods=['GET'])
+@token_required
+def get_user_tweets(**kwargs):
+    tweets = Tweet.query.filter(User.id == kwargs.get('current_user').id).all()
+    return jsonify([to_dict(tweet) for tweet in tweets])
+
 
 users_blueprint = Blueprint('users', __name__, url_prefix='/users')
 

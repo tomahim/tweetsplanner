@@ -6,7 +6,7 @@ import { Login } from './Login.js';
 import { LoggedIn } from './LoggedIn.js';
 import { Dashboard } from './Dashboard.js';
 import { PrivateRoute } from './PrivateRoute.js';
-import { authService } from './utils/auth.js';
+import { authService } from './utils/auth.service.js';
 
 const Welcome = () => (
     <div>

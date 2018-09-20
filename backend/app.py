@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from api.config import Config
-from api.api import PlayerAPI, users_blueprint
+from api.api import users_blueprint, tweets_blueprint
 from api.models import db
 
 
@@ -15,10 +15,7 @@ def create_app(config):
 
 
 def register_api(app):
-    # http://flask.pocoo.org/docs/1.0/views/#method-views-for-apis
-    player_view = PlayerAPI.as_view('player_api')
-    app.add_url_rule('/players', view_func=player_view, methods=['GET',])
-
+    app.register_blueprint(tweets_blueprint)
     app.register_blueprint(users_blueprint)
 
 def register_extensions(app):

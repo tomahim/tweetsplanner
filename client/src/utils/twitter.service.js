@@ -8,16 +8,37 @@ function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
+function getAuthHeaders() {
+    const authCookies = getCookie('Authorization');
+    return {
+        'Authorization': authCookies ? authCookies : '',
+        'Content-Type': 'application/json'
+    };
+}
+
 export const twitterService = {
-    getData() {
-        const authCookies = getCookie('Authorization');
-        const headers = {
-            'Authorization': authCookies ? authCookies : '',
-            'Content-Type': 'application/json'
-        };
-        return axios.get(CONFIG.API_BASE_URL + CONFIG.API_PLAYER_URL, {
+    get() {
+        return axios.get(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL, {
             withCredentials: true,
-            headers: headers
+            headers: getAuthHeaders()
+        });
+    },
+    add(text) {
+        return axios.post(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL, {text}, {
+            withCredentials: true,
+            headers: getAuthHeaders()
+        });
+    },
+    remove(id) {
+        return axios.delete(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL + '/' + id, {
+            withCredentials: true,
+            headers: getAuthHeaders()
+        });
+    },
+    update(id, text) {
+        return axios.put(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL + '/' + id, {text}, {
+            withCredentials: true,
+            headers: getAuthHeaders()
         });
     }
 };
