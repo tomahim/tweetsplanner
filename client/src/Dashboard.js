@@ -16,17 +16,33 @@ export class Dashboard extends Component {
     .then(result => this.setState({tweets: result.data}));
   }
 
-  removeTweet(id) {
-    twitterService.remove(id).then(() => {
-        this.setState({tweets: this.state.tweets.filter(tweet => tweet.id !== id)});
-    });
-  }
-
   addTweet(text) {
-    twitterService.add(text).then((result) => {
+    twitterService.add(text).then(result => {
         this.setState({
             tweets: this.state.tweets.concat({id: result.data.id, text: text, status: 'DRAFT'})
         });
+    });
+  }
+
+  editTweet(id, text) {
+    twitterService.update(id, text).then(() => {
+        this.setState({
+            tweets: this.state.tweets.map(item => {
+                if (item.id !== id) {
+                    return item;
+                }
+                return {
+                    ...item,
+                    text: text
+                };
+            })
+        });
+    });
+  }
+
+  removeTweet(id) {
+    twitterService.remove(id).then(() => {
+        this.setState({tweets: this.state.tweets.filter(tweet => tweet.id !== id)});
     });
   }
 
@@ -35,6 +51,7 @@ export class Dashboard extends Component {
         return (
             <li key={index}>
                 {tweet.id} - {tweet.text} - {tweet.status}
+                <button onClick={()=>this.editTweet(tweet.id, 'edited tweet !')}>Edit</button>
                 <button onClick={()=>this.removeTweet(tweet.id)}>Delete</button>
             </li>
         );
