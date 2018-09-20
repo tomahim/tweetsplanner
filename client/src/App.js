@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
 import { Login } from './Login.js';
@@ -9,7 +9,10 @@ import { PrivateRoute } from './PrivateRoute.js';
 import { authService } from './utils/auth.js';
 
 const Welcome = () => (
-    <h1>Welcome to the Tweet Planner App !</h1>
+    <div>
+        <h1>Welcome to the Tweet Planner App !</h1>
+        <Login />
+    </div>
 )
 
 // The Header creates links that can be used to navigate
@@ -36,24 +39,23 @@ class Header extends React.Component {
           {this.state.redirectToLogin &&
             <Redirect
               to={{
-                pathname: "/login"
+                pathname: "/"
               }}
             />
           }
           <ul>
             <li>
-              <Link to="/login">Login</Link>
               <Link to="/dashboard">Dashboard</Link>
-              <a onClick={this.logout}>Logout</a>
+              &nbsp;<a onClick={this.logout}>Logout</a>
             </li>
           </ul>
 
           <hr />
-
-          <Route exact path="/" component={Welcome} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/loggedin" component={LoggedIn} />
-          <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <Switch>
+              <Route exact path="/" component={Welcome} />
+              <Route exact path="/loggedin" component={LoggedIn} />
+              <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          </Switch>
         </header>
       </Router>
     );

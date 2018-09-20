@@ -6,17 +6,17 @@ function deleteCookie(cname) {
     var d = new Date(); //Create an date object
     d.setTime(d.getTime() - (1000*60*60*24)); //Set the time to the past. 1000 milliseonds = 1 second
     var expires = "expires=" + d.toGMTString(); //Compose the expirartion date
-    window.document.cookie = cname+"="+"; "+expires;//Set the cookie with name and the expiration date
+    window.document.cookie = cname + "=" + "; " +expires;//Set the cookie with name and the expiration date
 }
 
 export const authService = {
   isAuthenticated() {
       return document.cookie.split('Authorization=') && document.cookie.split('Authorization=').length === 2;
   },
-  authenticate(username, password) {
+  authenticate() {
       return axios.post(
         CONFIG.API_BASE_URL + CONFIG.API_USER_URL + '/login',
-        {username, password},
+        {},
         {withCredentials: true}
       )
       .then(response => {
@@ -39,7 +39,5 @@ export const authService = {
   },
   logout(cb) {
     deleteCookie('Authorization');
-    deleteCookie('oauth_secret');
-    deleteCookie('oauth_token');
   }
 };
