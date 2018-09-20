@@ -5,3 +5,4 @@ flask_sqlalchemy==2.3
 psycopg2
 werkzeug==0.13
 oauth2
+schedule==0.5.0

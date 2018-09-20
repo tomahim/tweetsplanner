@@ -5,6 +5,9 @@ from urllib import parse as urlparser
 import jwt
 import oauth2
 import tweepy
+import schedule
+import time
+import datetime
 from flask import current_app, jsonify, request, Blueprint, session
 
 from .models import JwtBlacklist, db, Tweet, to_dict
@@ -153,19 +156,6 @@ def confirm_authenticate():
     session.pop('request_token')
     return response
 
-@users_blueprint.route('/tweet', methods=['POST'])
-@token_required
-def tweet(**kwargs):
-    current_user = kwargs.get('current_user')
-    auth = tweepy.OAuthHandler(app_access_token['key'], app_access_token['secret'])
-    auth.set_access_token(current_user.oauth_token, current_user.oauth_secret)
-
-    api = tweepy.API(auth)
-    api.update_status(status='Updating using OAuth authentication via Tweepy!')
-    return jsonify({'status': 'ok'})
-
-
-
 @users_blueprint.route('/logout', methods=['POST'])
 @token_required
 def logout(**kwargs):
@@ -178,3 +168,21 @@ def logout(**kwargs):
 @token_required
 def me(**kwargs):
     return jsonify({'username': kwargs.get('current_user').username})
+
+####################
+###### Tweet Scheduler
+####################
+
+def send_planned_tweets():
+    print(datetime.datetime.now())
+
+    # TODO:
+    # - retrieve matching tweets for current date
+    # - Send the found tweets using specific user oauth tokens
+
+# schedule.every(10).minutes.do(job)
+schedule.every(1).seconds.do(send_planned_tweets)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
