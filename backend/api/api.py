@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from functools import wraps
 from urllib import parse as urlparser
+import traceback
 
 import jwt
 import oauth2
 import tweepy
 import schedule
 import time
-import datetime
 from flask import current_app, jsonify, request, Blueprint, session
 
 from .models import JwtBlacklist, db, Tweet, to_dict
@@ -49,9 +49,10 @@ def token_required(f):
             print(e)
             return jsonify(invalid_msg), 401
         except Exception as e:
+            print("here ?")
             print(e)
             return jsonify({
-                'message': 'An error occured',
+                'message': 'An error occured !',
                 'authenticated': True
             }), 500
 
@@ -86,7 +87,8 @@ tweets_blueprint = Blueprint('tweets', __name__, url_prefix='/tweets')
 @token_required
 def create_tweet(**kwargs):
     current_user = kwargs.get('current_user')
-    tweet = Tweet(text=request.json['text'], status='DRAFT')
+    send_date = datetime.strptime(request.json['date'], '%Y-%m-%dT%H:%M:%S%z')
+    tweet = Tweet(text=request.json['text'], send_date=send_date, status='DRAFT')
     current_user.tweets.append(tweet)
     db.session.flush()
     db.session.commit()
@@ -181,8 +183,8 @@ def send_planned_tweets():
     # - Send the found tweets using specific user oauth tokens
 
 # schedule.every(10).minutes.do(job)
-schedule.every(1).seconds.do(send_planned_tweets)
+# schedule.every(1).seconds.do(send_planned_tweets)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)

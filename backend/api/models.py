@@ -12,7 +12,8 @@ class Tweet(db.Model):
     __tablename__ = 'tweets'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    text = db.Column(db.String(100), nullable=False, primary_key=True)
+    text = db.Column(db.String(100), nullable=False)
+    send_date = db.Column(db.TIMESTAMP)
     status = db.Column(Enum("DRAFT", "PLANNED", "SENDED", name="status_enum", create_type=False), nullable=False)
 
     def __repr__(self):

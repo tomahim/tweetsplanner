@@ -11,6 +11,7 @@ CREATE TABLE tweets (
     id SERIAL PRIMARY KEY,
     user_id integer REFERENCES users (id),
     text TEXT,
+    send_date timestamp with time zone,
     status tweet_status NOT NULL
 );
 

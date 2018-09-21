@@ -3,6 +3,24 @@ import { CONFIG } from './config.js';
 
 
 import { twitterService } from './utils/twitter.service.js';
+
+Date.prototype.toIsoString = function() {
+    var tzo = -this.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function(num) {
+            var norm = Math.floor(Math.abs(num));
+            return (norm < 10 ? '0' : '') + norm;
+        };
+    return this.getFullYear() +
+        '-' + pad(this.getMonth() + 1) +
+        '-' + pad(this.getDate()) +
+        'T' + pad(this.getHours()) +
+        ':' + pad(this.getMinutes()) +
+        ':' + pad(this.getSeconds()) +
+        dif + pad(tzo / 60) +
+        ':' + pad(tzo % 60);
+}
+
 export class Dashboard extends Component {
   constructor() {
     super();
@@ -17,7 +35,7 @@ export class Dashboard extends Component {
   }
 
   addTweet(text) {
-    twitterService.add(text).then(result => {
+    twitterService.add(text, new Date().toIsoString()).then(result => {
         this.setState({
             tweets: this.state.tweets.concat({id: result.data.id, text: text, status: 'DRAFT'})
         });

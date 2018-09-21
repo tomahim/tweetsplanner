@@ -23,8 +23,8 @@ export const twitterService = {
             headers: getAuthHeaders()
         });
     },
-    add(text) {
-        return axios.post(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL, {text}, {
+    add(text, date) {
+        return axios.post(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL, {text, date}, {
             withCredentials: true,
             headers: getAuthHeaders()
         });
