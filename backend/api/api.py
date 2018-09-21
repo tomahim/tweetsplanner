@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 from urllib import parse as urlparser
 import traceback
+import logging
 
 import jwt
 import oauth2
@@ -49,8 +50,7 @@ def token_required(f):
             print(e)
             return jsonify(invalid_msg), 401
         except Exception as e:
-            print("here ?")
-            print(e)
+            logging.exception("message")
             return jsonify({
                 'message': 'An error occured !',
                 'authenticated': True
@@ -81,13 +81,20 @@ def get_twitter_auth_url():
 
     return url
 
+
+import dateutil.parser
+
+def get_datetime_from_iso8601(s):
+    d = dateutil.parser.parse(s)
+    return d
+
 tweets_blueprint = Blueprint('tweets', __name__, url_prefix='/tweets')
 
 @tweets_blueprint.route('', methods=['POST'])
 @token_required
 def create_tweet(**kwargs):
     current_user = kwargs.get('current_user')
-    send_date = datetime.strptime(request.json['date'], '%Y-%m-%dT%H:%M:%S%z')
+    send_date = get_datetime_from_iso8601(request.json['date'])
     tweet = Tweet(text=request.json['text'], send_date=send_date, status='DRAFT')
     current_user.tweets.append(tweet)
     db.session.flush()

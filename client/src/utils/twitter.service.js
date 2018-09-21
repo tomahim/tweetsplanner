@@ -11,8 +11,7 @@ function getCookie(name) {
 function getAuthHeaders() {
     const authCookies = getCookie('Authorization');
     return {
-        'Authorization': authCookies ? authCookies : '',
-        'Content-Type': 'application/json'
+        'Authorization': authCookies ? authCookies : ''
     };
 }
 

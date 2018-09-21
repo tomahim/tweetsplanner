@@ -19,4 +19,4 @@ for key in ${!arr[@]}; do
     docker-machine ssh default "sudo mount -t vboxsf -o defaults,uid=`id -u`,gid=`id -g` ${key} ${arr[${key}]}"
 done
 
-docker-compose up --build
+COMPOSE_HTTP_TIMEOUT=200 docker-compose up --build
