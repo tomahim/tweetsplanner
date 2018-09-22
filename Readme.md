@@ -12,8 +12,15 @@ This project is a demo application with the usage of various tools together :
 ### Pre-requirements
 
 - Docker
+- A Twitter Developer account and a registered application
 
-### Run the application
+### Configure / Run the application
+
+First, you will need to provide the twitter credentials of your application.
+
+See the template file [twitter-credentials.template.py](backend/twitter-credentials.template.py)
+
+Then, all you have to do is run the application by using this command :
 
 ```
 docker-compose up --build
@@ -21,8 +28,8 @@ docker-compose up --build
 
 ### Features roadmap
 
-- [x] Being able to launch ReactJS, Flask and PostgreSQL using Docker
-- [ ] Basic Login / registration feature (with JWT support) --> IN PROGRESS
-- [ ] Create a CRUD dashboard to plan tweets
-- [ ] Use Twitter API
+- [X] Being able to launch ReactJS, Flask and PostgreSQL using Docker
+- [X] Basic Login / registration feature (with JWT support) 
+- [ ] Create a CRUD dashboard to plan tweets --> IN PROGRESS
+- [ ] Use Twitter API to automatically send tweets
 - [ ] Add unit tests
