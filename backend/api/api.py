@@ -7,7 +7,7 @@ import jwt
 import oauth2
 from flask import current_app, jsonify, request, Blueprint, session
 
-from .models import JwtBlacklist, db, Tweet, to_dict
+from .models import JwtBlacklist, db, Tweet
 from .models import User
 from .twitter_credentials import app_access_token
 
@@ -116,7 +116,7 @@ def delete_tweet(**kwargs):
 @token_required
 def get_user_tweets(**kwargs):
     tweets = Tweet.query.filter(User.id == kwargs.get('current_user').id).all()
-    return jsonify([to_dict(tweet) for tweet in tweets])
+    return jsonify([tweet.json for tweet in tweets])
 
 
 users_blueprint = Blueprint('users', __name__, url_prefix='/users')
@@ -173,21 +173,3 @@ def logout(**kwargs):
 @token_required
 def me(**kwargs):
     return jsonify({'username': kwargs.get('current_user').username})
-
-####################
-###### Tweet Scheduler
-####################
-
-def send_planned_tweets():
-    print(datetime.utcnow())
-
-    # TODO:
-    # - retrieve matching tweets for current date
-    # - Send the found tweets using specific user oauth tokens
-
-# schedule.every(10).minutes.do(job)
-# schedule.every(1).seconds.do(send_planned_tweets)
-
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
