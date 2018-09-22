@@ -7,3 +7,4 @@ werkzeug==0.13
 oauth2
 schedule==0.5.0
 python-dateutil==2.7.3
+pytest==3.8.0

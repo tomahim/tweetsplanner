@@ -146,7 +146,12 @@ def confirm_authenticate():
 
     user = User.query.filter_by(username=username).first()
     if user is None:
-        new_user = User(username=username, twitter_id=access_token['user_id'][0], oauth_token=access_token['oauth_token'][0], oauth_secret=access_token['oauth_token_secret'][0])
+        new_user = User(
+            username=username,
+            twitter_id=access_token['user_id'][0],
+            oauth_token=access_token['oauth_token'][0],
+            oauth_secret=access_token['oauth_token_secret'][0]
+        )
         db.session.add(new_user)
         db.session.commit()
 

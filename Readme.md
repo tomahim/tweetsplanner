@@ -30,6 +30,6 @@ docker-compose up --build
 
 - [X] Being able to launch ReactJS, Flask and PostgreSQL using Docker
 - [X] Basic Login / registration feature (with JWT support) 
-- [ ] Create a CRUD dashboard to plan tweets --> IN PROGRESS
+- [ ] Create a CRUD dashboard to plan tweets --> IN PR  OGRESS
 - [ ] Use Twitter API to automatically send tweets
 - [ ] Add unit tests
