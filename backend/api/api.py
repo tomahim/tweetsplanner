@@ -1,14 +1,10 @@
+import logging
 from datetime import datetime, timedelta
 from functools import wraps
 from urllib import parse as urlparser
-import traceback
-import logging
 
 import jwt
 import oauth2
-import tweepy
-import schedule
-import time
 from flask import current_app, jsonify, request, Blueprint, session
 
 from .models import JwtBlacklist, db, Tweet, to_dict
@@ -84,7 +80,7 @@ def get_twitter_auth_url():
 
 import dateutil.parser
 
-def get_datetime_from_iso8601(s):
+def get_datetime_from_iso8601_string(s):
     d = dateutil.parser.parse(s)
     return d
 
@@ -94,7 +90,7 @@ tweets_blueprint = Blueprint('tweets', __name__, url_prefix='/tweets')
 @token_required
 def create_tweet(**kwargs):
     current_user = kwargs.get('current_user')
-    send_date = get_datetime_from_iso8601(request.json['date'])
+    send_date = get_datetime_from_iso8601_string(request.json['date'])
     tweet = Tweet(text=request.json['text'], send_date=send_date, status='DRAFT')
     current_user.tweets.append(tweet)
     db.session.flush()
@@ -183,7 +179,7 @@ def me(**kwargs):
 ####################
 
 def send_planned_tweets():
-    print(datetime.datetime.now())
+    print(datetime.utcnow())
 
     # TODO:
     # - retrieve matching tweets for current date

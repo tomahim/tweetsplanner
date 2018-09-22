@@ -31,13 +31,18 @@ export class Dashboard extends Component {
 
   componentDidMount() {
     twitterService.get()
-    .then(result => this.setState({tweets: result.data}));
+    .then(tweets => this.setState({tweets: tweets}));
   }
 
   addTweet(text) {
     twitterService.add(text, new Date().toIsoString()).then(result => {
         this.setState({
-            tweets: this.state.tweets.concat({id: result.data.id, text: text, status: 'DRAFT'})
+            tweets: this.state.tweets.concat({
+                id: result.data.id,
+                text: text,
+                status: 'DRAFT',
+                send_date: new Date().toLocaleString()
+            })
         });
     });
   }
@@ -68,7 +73,7 @@ export class Dashboard extends Component {
     const tweets = this.state.tweets.map((tweet, index) => {
         return (
             <li key={index}>
-                {tweet.id} - {tweet.text} - {tweet.status}
+                {tweet.id} - {tweet.text} - {tweet.status} - {tweet.send_date}
                 <button onClick={()=>this.editTweet(tweet.id, 'edited tweet !')}>Edit</button>
                 <button onClick={()=>this.removeTweet(tweet.id)}>Delete</button>
             </li>

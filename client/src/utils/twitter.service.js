@@ -20,6 +20,13 @@ export const twitterService = {
         return axios.get(CONFIG.API_BASE_URL + CONFIG.API_TWEET_URL, {
             withCredentials: true,
             headers: getAuthHeaders()
+        }).then(response => {
+            return response.data.map(el => {
+                return {
+                    ...el,
+                    send_date: new Date(el.send_date).toLocaleString()
+                };
+            });
         });
     },
     add(text, date) {
